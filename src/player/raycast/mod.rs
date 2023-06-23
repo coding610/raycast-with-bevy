@@ -12,7 +12,6 @@ impl Plugin for RaycastPlugin {
             calculate_rays,
             draw_rays,
             flush_rays
-        ).chain())
-            .add_system(set_rotation);
+        ).chain());
     }
 }

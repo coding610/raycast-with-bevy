@@ -16,29 +16,19 @@ pub fn get_quad(ray_rotation: f32) -> &'static str {
 
 pub fn tile_collide_ray(
     ray: Vec3,
-    collides: Query<&Transform, With<RayCollide>>,
-    ray_direction: &str /* Vertical check or horizontal check */
+    collides: &Query<&Transform, With<RayCollide>>,
 ) -> bool {
     let ray_tile = get_tile(ray);
-    let ray_under = get_tile(Vec3::new( ray.x, ray.y - 1.0, 0.0 ));
+    let ray_down = get_tile(Vec3::new( ray.x, ray.y - 1.0, 0.0 ));
+    let ray_left = get_tile(Vec3::new( ray.x - 1.0, ray.y, 0.0 ));
     for collide in collides.iter() {
         let collide_tile = get_tile(collide.translation);
-        if ray_direction > "horizontal" {
-            // Check tile over and under
-            // Here I assume that get tile will get the tile over
-            if ray_tile == collide_tile || ray_tile == ray_under {
-                return true;
-            } else {
-                return false;
-            }
+        if ray_tile == collide_tile || ray_down == collide_tile || ray_left == collide_tile {
+            return true;
         }
     }
 
     return false;
-}
-
-pub fn tile_collide() -> bool {
-    todo!();
 }
 
 pub fn get_tile(rect: Vec3) -> Vec2 {
