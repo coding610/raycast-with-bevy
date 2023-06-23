@@ -21,8 +21,9 @@ pub fn set_rotation(
     if let Ok((mut player_transform, mut player)) = player_query.get_single_mut() {
         if keyboard_input.just_pressed(KeyCode::R) {
             player.rotation = 90.0;
-            let new_rot = (360.0 - player_transform.rotation.z).abs();
-            player_transform.rotate_z(new_rot);
+            println!("{}", player_transform.rotation.z.to_degrees());
+            let new_rot = (360_f32.to_radians() - player_transform.rotation.z).abs();
+            player_transform.rotate_z(new_rot.to_radians());
         }
     }
 }
@@ -30,7 +31,8 @@ pub fn set_rotation(
 pub fn calculate_rays(
     mut player_query: Query<(&Transform, &mut Player), With<Player>>,
     _collide_query: Query<&Transform, With<RayCollide>>,
-    mut _shapes: ResMut<DebugShapes>
+    mut _shapes: ResMut<DebugShapes>,
+    mut _lines: ResMut<DebugLines>
 ) {
     if let Ok((player_transform, mut player)) = player_query.get_single_mut() {
         let quad = get_quad(player.rotation);
@@ -40,8 +42,8 @@ pub fn calculate_rays(
             quad
         );
         let increment = get_ray_increment(
-            player_transform.translation,
-            player.rotation.to_radians()
+            player.rotation.to_radians(),
+            quad,
         );
         let mut ray_vertical = Vec3::new(
             player_transform.translation.x + start_increment.0.x,
@@ -61,11 +63,19 @@ pub fn calculate_rays(
             ray_vertical.y += increment.0.y;
             ray_horizontal.x += increment.1.x;
             ray_horizontal.y += increment.1.y;
+            // if ray_horizontal 
         }
 
-        let mut minimal_ray = ray_vertical;
-        if ray_lenght(ray_horizontal) < ray_lenght(ray_vertical) { minimal_ray = ray_horizontal; println!("hori") }
-        else { println!("vert"); }
+        let minimal_ray;
+        let color_;
+        if ray_lenght(player_transform.translation, ray_horizontal) < ray_lenght(player_transform.translation, ray_vertical) {
+            minimal_ray = ray_horizontal;
+            color_ = Color::rgb(0.0, 0.0, 255.0);
+        }
+        else {
+            minimal_ray = ray_vertical;
+            color_ = Color::rgb(255.0, 0.0, 0.0);
+        }
 
         player.rays.push(
             PlayerRay {
@@ -74,6 +84,7 @@ pub fn calculate_rays(
                 collision: Vec3::splat(0.0),
                 direction: (Vec3::splat(0.0), Vec3::splat(0.0)),
                 rotation: 0.0,
+                color: color_
             }
         );
     }
@@ -86,7 +97,7 @@ pub fn draw_rays(
 ) {
     if let Ok(player) = player_query.get_single() {
         for ray in player.rays.iter() {
-            lines.line(ray.start, ray.end, 0.0);
+            lines.line_colored(ray.start, ray.end, 0.0, ray.color);
         }
     }
 }

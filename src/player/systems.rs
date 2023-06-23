@@ -17,7 +17,7 @@ pub fn spawn_player(
             ..default()
         },
         Player {
-            rotation: 135.0,
+            rotation: PLAYER_STARTING_ROTATION,
             velocity: Vec3::new(0.0, 0.0, 0.0),
             is_colliding: false,
             rays: vec!(),
