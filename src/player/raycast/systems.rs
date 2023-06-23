@@ -2,9 +2,10 @@
 use bevy::prelude::*;
 use bevy_prototype_debug_lines::*;
 use super::components::*;
-use super::consts::*;
+use super::resources::*;
 use crate::player::components::*;
 use crate::tile::components::RayCollide;
+use crate::tile::consts::TILESIZE;
 use crate::math::*;
 
 pub fn flush_rays(mut player_query: Query<&mut Player, With<Player>>) {
@@ -13,28 +14,40 @@ pub fn flush_rays(mut player_query: Query<&mut Player, With<Player>>) {
     }
 }
 
+pub fn chage_ray_vars(
+    mut ray_resource: ResMut<RayVars>,
+    keyboard_input: Res<Input<KeyCode>>
+) {
+    if keyboard_input.pressed(KeyCode::I) { ray_resource.ray_rotation_step += 0.05; }
+    if keyboard_input.pressed(KeyCode::O) && ray_resource.ray_rotation_step > 0.05 { ray_resource.ray_rotation_step -= 0.05; }
+    if keyboard_input.pressed(KeyCode::K) { ray_resource.fov += 5.0; }
+    if keyboard_input.pressed(KeyCode::L) { ray_resource.fov -= 5.0; }
+    if keyboard_input.pressed(KeyCode::P) { ray_resource.ray_max_depth += 1.0; }
+    if keyboard_input.pressed(KeyCode::LBracket) { ray_resource.ray_max_depth -= 1.0; } // KeyCode::Å
+}
+
 pub fn calculate_rays(
     mut player_query: Query<(&Transform, &mut Player), With<Player>>,
     collide_query: Query<&Transform, With<RayCollide>>,
+    ray_resource: ResMut<RayVars>,
     mut lines: ResMut<DebugLines>,
     keyboard_input: Res<Input<KeyCode>>,
 ) {
     if let Ok((player_transform, mut player)) = player_query.get_single_mut() {
         let color_ = Color::rgb(255.0, 255.0, 255.0);
-        let ray_rotation_step: f32 = 1.0;
+        let mut ray_rotation: f32 = (-ray_resource.fov/2.0) + player.rotation;
+        for _rayindex in 0..((ray_resource.fov * (1.0/ray_resource.ray_rotation_step)) as i32) {
+            ray_rotation += ray_resource.ray_rotation_step;
+            ray_rotation = adjust_rotation(ray_rotation);
 
-        let mut ray_rotation: f32 = -FOV/2.0;
-        for _rayindex in 0..((FOV * ray_rotation_step) as i32) {
-            ray_rotation += ray_rotation_step;
-
-            let quad = get_quad(player.rotation);
+            let quad = get_quad(ray_rotation);
             let start_increment = get_ray_start_increment(
                 player_transform.translation,
-                player.rotation.to_radians(),
+                ray_rotation.to_radians(),
                 quad
             );
             let increment = get_ray_increment(
-                player.rotation.to_radians(),
+                ray_rotation.to_radians(),
                 quad,
             );
             let mut ray_vertical = Vec3::new(
@@ -52,7 +65,7 @@ pub fn calculate_rays(
             let mut collided_horizontal = false;
             let mut depth: f32 = 0.0;
             /* NOTE: IF ONE OF THEM COLLIDES: THE OTHER ONE DOES TOO */
-            while depth < MAX_DEPTH {
+            while depth < ray_resource.ray_max_depth {
                 if tile_collide_ray(ray_vertical, &collide_query) {
                     collided_vertical = true;
                 } if tile_collide_ray(ray_horizontal, &collide_query) {
@@ -68,49 +81,57 @@ pub fn calculate_rays(
                 }
             }
 
-            let minimal_ray;
-            if ray_lenght(player_transform.translation, ray_horizontal) < ray_lenght(player_transform.translation, ray_vertical) {
-                minimal_ray = ray_horizontal;
-            } else {
-                minimal_ray = ray_vertical;
-            }
-
             let default_ray;
-            if collided_vertical && collided_horizontal {
-                default_ray = minimal_ray;
-            } else if collided_vertical {
-                default_ray = ray_vertical;
-            } else if collided_horizontal {
+            if ray_lenght(player_transform.translation, ray_horizontal) < ray_lenght(player_transform.translation, ray_vertical) {
                 default_ray = ray_horizontal;
             } else {
-                default_ray = minimal_ray;
+                default_ray = ray_vertical;
             }
+
+            player.rays.push(
+                PlayerRay {
+                    start: player_transform.translation,
+                    end: default_ray,
+                    collision: default_ray, /* Should be a list of vecs, but we wont use it anyways */
+                    direction: (player_transform.translation, default_ray),
+                    rotation: ray_rotation,
+                    rotation_radians: ray_rotation.to_radians(),
+                    color: color_
+                }
+            );
 
             if keyboard_input.pressed(KeyCode::Q) {
                 lines.line_colored(player_transform.translation, ray_vertical, 0.0, Color::rgb(0.0, 0.0, 255.0));
             } else if keyboard_input.pressed(KeyCode::E) {
                 lines.line_colored(player_transform.translation, ray_horizontal, 0.0, Color::rgb(255.0, 0.0, 0.0));
             }
-            
-
-            player.rays.push(
-                PlayerRay {
-                    start: player_transform.translation,
-                    end: default_ray,
-                    collision: Vec3::splat(0.0),
-                    direction: (Vec3::splat(0.0), Vec3::splat(0.0)),
-                    rotation: 0.0,
-                    color: color_
-                }
-            );
         }
     }
 }
 
 
+pub fn shorten_rays(
+    mut player_query: Query<(&Transform, &mut Player), With<Player>>,
+    ray_resource: ResMut<RayVars>
+) {
+    if let Ok((transform, mut player)) = player_query.get_single_mut() {
+        let max_len = ray_resource.ray_max_depth * TILESIZE;
+
+        for ray in player.rays.iter_mut() {
+            if ray_lenght(transform.translation, ray.end) > max_len {
+                let ray_angle = ray.rotation;
+                let mut new_ray = Vec3::new(0.0, 0.0, 0.0);
+                new_ray.x = ray_angle.sin() * max_len;
+                new_ray.y = ray_angle.cos() * max_len;
+                ray.end = new_ray;
+            }
+        }
+    }
+}
+
 pub fn draw_rays(
     player_query: Query<&Player, With<Player>>,
-    mut lines: ResMut<DebugLines>
+    mut lines: ResMut<DebugLines>,
 ) {
     if let Ok(player) = player_query.get_single() {
         for ray in player.rays.iter() {

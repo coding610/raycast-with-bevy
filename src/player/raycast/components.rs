@@ -7,5 +7,6 @@ pub struct PlayerRay {
     pub collision: Vec3,
     pub direction: (Vec3, Vec3),
     pub rotation: f32,
+    pub rotation_radians: f32,
     pub color: Color
 }

@@ -4,6 +4,7 @@ use super::components::*;
 use super::consts::*;
 use crate::tile::wall::components::*;
 use crate::tile::consts::*;
+use crate::math::adjust_rotation;
 
 
 pub fn spawn_player(
@@ -50,11 +51,7 @@ pub fn player_movement(
             player_transform.rotate_z(-PLAYER_ROTATING_SPEED.to_radians());
         }
 
-        if player.rotation >= 360.0 {
-            player.rotation = (360.0 - player.rotation).abs();
-        } else if player.rotation < 0.0 {
-            player.rotation = 360.0 - player.rotation.abs();
-        }
+        player.rotation = adjust_rotation(player.rotation);
 
         // Its already normalized, but who cares...
         if direction.length() > 0.0 { direction = direction.normalize(); }
