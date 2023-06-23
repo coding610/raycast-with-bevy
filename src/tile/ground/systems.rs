@@ -1,9 +1,8 @@
 use bevy::prelude::*;
 use bevy::window::PrimaryWindow;
 use super::components::*;
+use crate::tile::consts::TILESIZE;
 
-
-pub const GROUNDTILE_SIZE: f32 = 41.0;
 
 // Startup system
 pub fn spawn_ground(
@@ -15,11 +14,11 @@ pub fn spawn_ground(
 
     let mut wall_positions = vec![];
 
-    for pos_x in 0..(window.width() / GROUNDTILE_SIZE + GROUNDTILE_SIZE) as i32 {
-        for pos_y in 0..(window.height() / GROUNDTILE_SIZE + GROUNDTILE_SIZE) as i32 {
+    for pos_x in 0..(window.width() / TILESIZE + TILESIZE) as i32 {
+        for pos_y in 0..(window.height() / TILESIZE + TILESIZE) as i32 {
             wall_positions.push((
-                (pos_x as f32) * GROUNDTILE_SIZE + GROUNDTILE_SIZE / 2.0,
-                (pos_y as f32) * GROUNDTILE_SIZE + GROUNDTILE_SIZE / 2.0
+                ((pos_x as f32) * TILESIZE), 
+                ((pos_y as f32) * TILESIZE)
             ));
         }
     }
@@ -31,7 +30,7 @@ pub fn spawn_ground(
                 texture: assets_server.load("sprites/ground.png"),
                 ..default()
             },
-            Ground {}
+            Ground {},
         ));
     }
 }

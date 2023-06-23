@@ -1,25 +1,18 @@
 use bevy::prelude::*;
-use bevy::window::PrimaryWindow;
 use bevy::sprite::collide_aabb::*;
 use super::components::*;
-use crate::wall::components::*;
-use crate::wall::systems::WALLTILE_SIZE;
+use super::consts::*;
+use crate::tile::wall::components::*;
+use crate::tile::consts::*;
 
-
-pub const PLAYER_SIZE: f32 = 41.0;
-pub const PLAYER_SPEED: f32 = 300.0;
-pub const PLAYER_ROTATING_SPEED: f32 = 5.0;
 
 pub fn spawn_player(
     mut commands: Commands,
-    window_query: Query<&Window, With<PrimaryWindow>>,
     assets_server: Res<AssetServer>
 ) {
-    let window = window_query.get_single().unwrap();
-
     commands.spawn((
         SpriteBundle {
-            transform: Transform::from_xyz(window.width() / 2.0, window.height() / 2.0, 0.0),
+            transform: Transform::from_xyz(PLAYER_STARTING_POSITION.x, PLAYER_STARTING_POSITION.y, 0.0),
             texture: assets_server.load("sprites/player_pixel.png"),
             ..default()
         },
@@ -28,7 +21,7 @@ pub fn spawn_player(
             velocity: Vec3::new(0.0, 0.0, 0.0),
             is_colliding: false,
             rays: vec!(),
-        }
+        },
     ));
 }
 
@@ -57,9 +50,9 @@ pub fn player_movement(
             player_transform.rotate_z(-PLAYER_ROTATING_SPEED.to_radians());
         }
 
-        if player.rotation > 360.0 {
+        if player.rotation >= 360.0 {
             player.rotation = (360.0 - player.rotation).abs();
-        } else if player.rotation < -360.0 {
+        } else if player.rotation < 0.0 {
             player.rotation = 360.0 - player.rotation.abs();
         }
 
@@ -76,7 +69,7 @@ pub fn player_collision(
     wall_query: Query<&Transform, With<Wall>>,
 ) {
     let player_size = Vec2::new(PLAYER_SIZE, PLAYER_SIZE);
-    let wall_size = Vec2::new(WALLTILE_SIZE, WALLTILE_SIZE);
+    let wall_size = Vec2::new(TILESIZE, TILESIZE);
 
     if let Ok((mut player_transform, mut player)) = player_query.get_single_mut() {
         for wall_transform in wall_query.iter() {
@@ -86,16 +79,16 @@ pub fn player_collision(
                 player.is_colliding = true;
                 match collision_enum {
                     Some(Collision::Left) => {
-                        player_transform.translation.x = wall_transform.translation.x - (WALLTILE_SIZE / 2.0) - (PLAYER_SIZE / 2.0);
+                        player_transform.translation.x = wall_transform.translation.x - (TILESIZE / 2.0) - (PLAYER_SIZE / 2.0);
                     }
                     Some(Collision::Right) => {
-                        player_transform.translation.x = wall_transform.translation.x + (WALLTILE_SIZE / 2.0) + (PLAYER_SIZE / 2.0);
+                        player_transform.translation.x = wall_transform.translation.x + (TILESIZE / 2.0) + (PLAYER_SIZE / 2.0);
                     },
                     Some(Collision::Top) => {
-                        player_transform.translation.y = wall_transform.translation.y + (WALLTILE_SIZE / 2.0) + (PLAYER_SIZE / 2.0);
+                        player_transform.translation.y = wall_transform.translation.y + (TILESIZE / 2.0) + (PLAYER_SIZE / 2.0);
                     },
                     Some(Collision::Bottom) => {
-                        player_transform.translation.y = wall_transform.translation.y - (WALLTILE_SIZE / 2.0) - (PLAYER_SIZE / 2.0);
+                        player_transform.translation.y = wall_transform.translation.y - (TILESIZE / 2.0) - (PLAYER_SIZE / 2.0);
                     },
                     Some(Collision::Inside) => {},
                     None => {}

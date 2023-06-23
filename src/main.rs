@@ -1,14 +1,13 @@
 use bevy::prelude::*;
 use bevy_prototype_debug_lines::*;
-use systems::*;
-use player::*;
-use wall::*;
-use ground::*;
+use systems::CorePlugin;
+use player::PlayerPlugin;
+use tile::TilePlugin;
 
 mod systems;
 mod player;
-mod wall;
-mod ground;
+mod tile;
+mod math;
 
 fn main() {
     App::new()
@@ -16,7 +15,6 @@ fn main() {
         .add_plugin(DebugLinesPlugin::default())
         .add_plugin(CorePlugin)
         .add_plugin(PlayerPlugin)
-        .add_plugin(WallPlugin)
-        .add_plugin(GroundPlugin)
+        .add_plugin(TilePlugin)
         .run();
 }

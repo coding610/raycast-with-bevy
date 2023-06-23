@@ -17,7 +17,6 @@ pub fn spawn_camera(
 }
 
 pub struct CorePlugin;
-
 impl Plugin for CorePlugin {
     fn build(&self, app: &mut App) {
         app.add_startup_system(spawn_camera);
