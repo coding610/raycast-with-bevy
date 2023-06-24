@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 use bevy::window::PrimaryWindow;
 use super::components::*;
-use crate::tile::consts::TILESIZE;
+use crate::game::tile::consts::TILESIZE;
 
 
 // Startup system
@@ -11,11 +11,10 @@ pub fn spawn_ground(
     assets_server: Res<AssetServer>
 ) {
     let window = window_query.get_single().unwrap();
-
     let mut wall_positions = vec![];
 
-    for pos_x in 0..(window.width() / TILESIZE + TILESIZE) as i32 {
-        for pos_y in 0..(window.height() / TILESIZE + TILESIZE) as i32 {
+    for pos_x in 0..(window.width() / TILESIZE).ceil() as i32 {
+        for pos_y in 0..(window.height() / TILESIZE).ceil() as i32 {
             wall_positions.push((
                 ((pos_x as f32) * TILESIZE), 
                 ((pos_y as f32) * TILESIZE)

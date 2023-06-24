@@ -3,9 +3,9 @@ use bevy::prelude::*;
 use bevy_prototype_debug_lines::*;
 use super::components::*;
 use super::resources::*;
-use crate::player::components::*;
-use crate::tile::components::RayCollide;
-use crate::tile::consts::TILESIZE;
+use crate::game::player::components::*;
+use crate::game::tile::components::RayCollide;
+use crate::game::tile::consts::TILESIZE;
 use crate::math::*;
 
 pub fn flush_rays(mut player_query: Query<&mut Player, With<Player>>) {
@@ -14,7 +14,7 @@ pub fn flush_rays(mut player_query: Query<&mut Player, With<Player>>) {
     }
 }
 
-pub fn chage_ray_vars(
+pub fn change_ray_vars(
     mut ray_resource: ResMut<RayVars>,
     keyboard_input: Res<Input<KeyCode>>
 ) {
@@ -130,10 +130,15 @@ pub fn shorten_rays(
 pub fn draw_rays(
     player_query: Query<&Player, With<Player>>,
     mut lines: ResMut<DebugLines>,
+    keyboard_input: Res<Input<KeyCode>>,
 ) {
     if let Ok(player) = player_query.get_single() {
         for ray in player.rays.iter() {
             lines.line_colored(ray.start, ray.end, 0.0, ray.color);
         }
+    }
+
+    if keyboard_input.pressed(KeyCode::B) {
+        lines.line(Vec3::splat(0.0), Vec3::splat(100.0), 0.0);
     }
 }

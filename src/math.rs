@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 use std::f32::consts::PI;
-use crate::tile::consts::TILESIZE;
-use crate::tile::components::RayCollide;
+use crate::game::tile::consts::TILESIZE;
+use crate::game::tile::components::RayCollide;
 
 
 pub fn get_quad(ray_rotation: f32) -> &'static str {

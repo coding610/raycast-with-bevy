@@ -1,6 +1,5 @@
 use bevy::prelude::*;
-use bevy::window::PrimaryWindow;
-
+use bevy::window::{PresentMode, PrimaryWindow, WindowMode, CursorGrabMode};
 
 pub fn spawn_camera(
     mut commands: Commands,
@@ -16,9 +15,20 @@ pub fn spawn_camera(
     );
 }
 
+fn setup_window(mut window_query: Query<&mut Window, With<PrimaryWindow>>) {
+    let mut window = window_query.single_mut();
+    window.title = format!("La raycaster");
+    window.present_mode = PresentMode::AutoVsync;
+    window.cursor.visible = false;
+    window.resizable = false;
+    // window.mode = WindowMode::BorderlessFullscreen;
+    // window.cursor.grab_mode = CursorGrabMode::Locked;
+}
+
 pub struct CorePlugin;
 impl Plugin for CorePlugin {
     fn build(&self, app: &mut App) {
-        app.add_startup_system(spawn_camera);
+        app.add_startup_system(spawn_camera)
+            .add_startup_system(setup_window);
     }
 }

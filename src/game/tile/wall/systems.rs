@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 use super::components::*;
-use crate::tile::consts::TILESIZE;
-use crate::tile::components::RayCollide;
+use crate::game::tile::consts::TILESIZE;
+use crate::game::tile::components::RayCollide;
 
 
 // Startup system

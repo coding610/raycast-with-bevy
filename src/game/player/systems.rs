@@ -2,8 +2,8 @@ use bevy::prelude::*;
 use bevy::sprite::collide_aabb::*;
 use super::components::*;
 use super::consts::*;
-use crate::tile::wall::components::*;
-use crate::tile::consts::*;
+use crate::game::tile::wall::components::*;
+use crate::game::tile::consts::*;
 use crate::math::adjust_rotation;
 
 

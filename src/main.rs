@@ -1,20 +1,19 @@
 use bevy::prelude::*;
+use bevy::window::close_on_esc;
 use bevy_prototype_debug_lines::*;
 use systems::CorePlugin;
-use player::PlayerPlugin;
-use tile::TilePlugin;
+use game::GamePlugin;
 
 mod systems;
-mod player;
-mod tile;
 mod math;
+mod game;
 
 fn main() {
     App::new()
         .add_plugins(DefaultPlugins)
         .add_plugin(DebugLinesPlugin::default())
+        .add_system(close_on_esc)
         .add_plugin(CorePlugin)
-        .add_plugin(PlayerPlugin)
-        .add_plugin(TilePlugin)
+        .add_plugin(GamePlugin)
         .run();
 }

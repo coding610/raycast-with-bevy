@@ -1,5 +1,5 @@
 use bevy::prelude::*;
-use crate::tile::consts::TILESIZE;
+use crate::game::tile::consts::TILESIZE;
 
 
 pub const PLAYER_SIZE: f32 = 41.0;
