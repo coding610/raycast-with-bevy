@@ -92,10 +92,8 @@ pub fn calculate_rays(
                 PlayerRay {
                     start: player_transform.translation,
                     end: default_ray,
-                    collision: default_ray, /* Should be a list of vecs, but we wont use it anyways */
-                    direction: (player_transform.translation, default_ray),
-                    rotation: ray_rotation,
-                    rotation_radians: ray_rotation.to_radians(),
+                    rotation: ray_rotation.to_radians(),
+                    collided: (collided_horizontal && default_ray == ray_horizontal) || (collided_horizontal && default_ray == ray_horizontal), // This will by chaged later
                     color: color_
                 }
             );
@@ -116,14 +114,14 @@ pub fn shorten_rays(
 ) {
     if let Ok((transform, mut player)) = player_query.get_single_mut() {
         let max_len = ray_resource.ray_max_depth * TILESIZE;
-
         for ray in player.rays.iter_mut() {
             if ray_lenght(transform.translation, ray.end) > max_len {
                 let ray_angle = ray.rotation;
                 let mut new_ray = Vec3::new(0.0, 0.0, 0.0);
-                new_ray.x = ray_angle.sin() * max_len;
-                new_ray.y = ray_angle.cos() * max_len;
+                new_ray.x = transform.translation.x + ray_angle.cos() * max_len;
+                new_ray.y = transform.translation.y + ray_angle.sin() * max_len;
                 ray.end = new_ray;
+                ray.collided = false;
             }
         }
     }

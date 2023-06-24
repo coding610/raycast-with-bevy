@@ -12,6 +12,7 @@ impl Plugin for RaycastPlugin {
         app.insert_resource(RayVars {ray_rotation_step: 1.0, ray_max_depth: 10.0, fov: 90.0} )
             .add_systems((
             calculate_rays,
+            shorten_rays,
             draw_rays,
             flush_rays
         ).chain())
