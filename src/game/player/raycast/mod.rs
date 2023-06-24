@@ -1,11 +1,13 @@
 use bevy::prelude::*;
 use resources::*;
 use systems::*;
-
+use display::*;
+use crate::game::SimulationState;
 
 pub mod systems;
 pub mod components;
 pub mod resources;
+pub mod display;
 
 pub struct RaycastPlugin;
 impl Plugin for RaycastPlugin {
@@ -17,6 +19,7 @@ impl Plugin for RaycastPlugin {
                 calculate_rays,
                 shorten_rays,
                 draw_rays,
+                display_raycast.run_if(in_state(SimulationState::Raycastig)).before(flush_rays),
                 flush_rays
             ).chain()); /* Make this on chain in the future for better perf */
 

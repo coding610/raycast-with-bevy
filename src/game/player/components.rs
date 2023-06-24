@@ -7,5 +7,5 @@ pub struct Player {
     pub rotation: f32,
     pub velocity: Vec3,
     pub is_colliding: bool,
-    pub rays: Vec<PlayerRay>
+    pub rays: Vec<PlayerRay>,
 }

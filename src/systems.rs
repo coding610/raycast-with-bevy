@@ -19,8 +19,9 @@ fn setup_window(mut window_query: Query<&mut Window, With<PrimaryWindow>>) {
     let mut window = window_query.single_mut();
     window.title = format!("La raycaster");
     window.present_mode = PresentMode::AutoVsync;
-    window.cursor.visible = false;
-    window.resizable = false;
+    println!("res: {:#?}", window.resolution);
+    // window.cursor.visible = false;
+    // window.resizable = false;
     // window.mode = WindowMode::BorderlessFullscreen;
     // window.cursor.grab_mode = CursorGrabMode::Locked;
 }

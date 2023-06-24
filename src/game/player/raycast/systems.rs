@@ -1,5 +1,6 @@
 #![allow(unused_assignments)]
 use bevy::prelude::*;
+use bevy::window::PrimaryWindow;
 use bevy_prototype_debug_lines::*;
 use super::components::*;
 use super::resources::*;
@@ -18,8 +19,8 @@ pub fn change_ray_vars(
     mut ray_resource: ResMut<RayVars>,
     keyboard_input: Res<Input<KeyCode>>
 ) {
-    if keyboard_input.pressed(KeyCode::I) { ray_resource.ray_rotation_step += 0.05; }
-    if keyboard_input.pressed(KeyCode::O) && ray_resource.ray_rotation_step > 0.05 { ray_resource.ray_rotation_step -= 0.05; }
+    if keyboard_input.pressed(KeyCode::I) && ray_resource.ray_rotation_step > 0.05 { ray_resource.ray_rotation_step -= 0.05; }
+    if keyboard_input.pressed(KeyCode::O) { ray_resource.ray_rotation_step += 0.05; }
     if keyboard_input.pressed(KeyCode::K) { ray_resource.fov += 5.0; }
     if keyboard_input.pressed(KeyCode::L) { ray_resource.fov -= 5.0; }
     if keyboard_input.pressed(KeyCode::P) { ray_resource.ray_max_depth += 1.0; }
@@ -29,7 +30,7 @@ pub fn change_ray_vars(
 pub fn calculate_rays(
     mut player_query: Query<(&Transform, &mut Player), With<Player>>,
     collide_query: Query<&Transform, With<RayCollide>>,
-    ray_resource: ResMut<RayVars>,
+    ray_resource: Res<RayVars>,
     mut lines: ResMut<DebugLines>,
     keyboard_input: Res<Input<KeyCode>>,
 ) {
@@ -92,8 +93,9 @@ pub fn calculate_rays(
                 PlayerRay {
                     start: player_transform.translation,
                     end: default_ray,
+                    distance: ray_lenght(player_transform.translation, default_ray),
                     rotation: ray_rotation.to_radians(),
-                    color: color_
+                    color: color_,
                 }
             );
 
@@ -102,6 +104,7 @@ pub fn calculate_rays(
             } else if keyboard_input.pressed(KeyCode::E) {
                 lines.line_colored(player_transform.translation, ray_horizontal, 0.0, Color::rgb(255.0, 0.0, 0.0));
             }
+
         }
     }
 }
@@ -128,15 +131,19 @@ pub fn shorten_rays(
 pub fn draw_rays(
     player_query: Query<&Player, With<Player>>,
     mut lines: ResMut<DebugLines>,
+    mut shapes: ResMut<DebugShapes>,
     keyboard_input: Res<Input<KeyCode>>,
+    window_query: Query<&Window, With<PrimaryWindow>>
 ) {
+    let window = window_query.get_single().unwrap();
     if let Ok(player) = player_query.get_single() {
         for ray in player.rays.iter() {
             lines.line_colored(ray.start, ray.end, 0.0, Color::RED);
         }
     }
 
-    // if keyboard_input.pressed(KeyCode::B) {
-    //     lines.line(Vec3::splat(0.0), Vec3::splat(100.0), 0.0);
-    // }
+    if keyboard_input.pressed(KeyCode::B) {
+        shapes.circle().position(Vec3::new(0.0, 0.0, 0.0)).radius(10.0).color(Color::YELLOW);
+        println!("{}    {}", window.width(), window.height());
+    }
 }

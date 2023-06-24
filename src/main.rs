@@ -11,8 +11,8 @@ mod game;
 fn main() {
     App::new()
         .add_plugins(DefaultPlugins)
-        .add_plugin(DebugLinesPlugin::default())
         .add_system(close_on_esc)
+        .add_plugin(DebugLinesPlugin::default())
         .add_plugin(CorePlugin)
         .add_plugin(GamePlugin)
         .run();

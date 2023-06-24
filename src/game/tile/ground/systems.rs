@@ -16,8 +16,8 @@ pub fn spawn_ground(
     for pos_x in 0..(window.width() / TILESIZE).ceil() as i32 {
         for pos_y in 0..(window.height() / TILESIZE).ceil() as i32 {
             wall_positions.push((
-                ((pos_x as f32) * TILESIZE), 
-                ((pos_y as f32) * TILESIZE)
+                ((pos_x as f32) * TILESIZE) + (TILESIZE), 
+                ((pos_y as f32) * TILESIZE) + (TILESIZE)
             ));
         }
     }

@@ -11,6 +11,7 @@ pub fn spawn_wall(
 ) {
     let wall_positions = vec!(
         ([ (10, 10), (10, 14) ], true),
+        ([ (10, 10), (10, 14) ], true),
 
         ([ (0, 0), (31, 0) ], true),
         ([ (0, 0), (0, 18) ], true),
