@@ -43,12 +43,12 @@ pub fn player_movement(
             direction.x = -player.rotation.to_radians().cos();
         }
         if keyboard_input.pressed(KeyCode::Left) || keyboard_input.pressed(KeyCode::A) {
-            player.rotation += PLAYER_ROTATING_SPEED * time.delta_seconds();
-            player_transform.rotate_z(PLAYER_ROTATING_SPEED.to_radians() * time.delta_seconds());
+            player.rotation += PLAYER_ROTATING_SPEED;
+            player_transform.rotate_z(PLAYER_ROTATING_SPEED.to_radians());
         }
         if keyboard_input.pressed(KeyCode::Right) || keyboard_input.pressed(KeyCode::D) {
-            player.rotation -= PLAYER_ROTATING_SPEED * time.delta_seconds();
-            player_transform.rotate_z(-PLAYER_ROTATING_SPEED.to_radians() * time.delta_seconds());
+            player.rotation -= PLAYER_ROTATING_SPEED;
+            player_transform.rotate_z(-PLAYER_ROTATING_SPEED.to_radians());
         }
 
         player.rotation = adjust_rotation(player.rotation);
