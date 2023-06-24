@@ -64,7 +64,7 @@ pub fn calculate_rays(
             let mut collided_vertical = false;
             let mut collided_horizontal = false;
             let mut depth: f32 = 0.0;
-            /* NOTE: IF ONE OF THEM COLLIDES: THE OTHER ONE DOES TOO */
+            /* NOTE: IF ONE OF THEM COLLIDES: THE OTHER ONE DOES TOO (eventually) */
             while depth < ray_resource.ray_max_depth {
                 if tile_collide_ray(ray_vertical, &collide_query) {
                     collided_vertical = true;
@@ -92,10 +92,7 @@ pub fn calculate_rays(
                 PlayerRay {
                     start: player_transform.translation,
                     end: default_ray,
-                    collision: default_ray, /* Should be a list of vecs, but we wont use it anyways */
-                    direction: (player_transform.translation, default_ray),
-                    rotation: ray_rotation,
-                    rotation_radians: ray_rotation.to_radians(),
+                    rotation: ray_rotation.to_radians(),
                     color: color_
                 }
             );
@@ -116,13 +113,12 @@ pub fn shorten_rays(
 ) {
     if let Ok((transform, mut player)) = player_query.get_single_mut() {
         let max_len = ray_resource.ray_max_depth * TILESIZE;
-
         for ray in player.rays.iter_mut() {
             if ray_lenght(transform.translation, ray.end) > max_len {
                 let ray_angle = ray.rotation;
-                let mut new_ray = Vec3::new(0.0, 0.0, 0.0);
-                new_ray.x = ray_angle.sin() * max_len;
-                new_ray.y = ray_angle.cos() * max_len;
+                let mut new_ray = Vec3::new(transform.translation.x, transform.translation.y, 0.0);
+                new_ray.x += ray_angle.cos() * max_len;
+                new_ray.y += ray_angle.sin() * max_len;
                 ray.end = new_ray;
             }
         }
@@ -136,11 +132,11 @@ pub fn draw_rays(
 ) {
     if let Ok(player) = player_query.get_single() {
         for ray in player.rays.iter() {
-            lines.line_colored(ray.start, ray.end, 0.0, ray.color);
+            lines.line_colored(ray.start, ray.end, 0.0, Color::RED);
         }
     }
 
-    if keyboard_input.pressed(KeyCode::B) {
-        lines.line(Vec3::splat(0.0), Vec3::splat(100.0), 0.0);
-    }
+    // if keyboard_input.pressed(KeyCode::B) {
+    //     lines.line(Vec3::splat(0.0), Vec3::splat(100.0), 0.0);
+    // }
 }
