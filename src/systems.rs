@@ -1,3 +1,4 @@
+#![allow(unused_imports)]
 use bevy::prelude::*;
 use bevy::window::{PresentMode, PrimaryWindow, WindowMode, CursorGrabMode};
 

@@ -10,6 +10,7 @@ mod game;
 
 fn main() {
     App::new()
+        .insert_resource(Msaa::Sample4)
         .add_plugins(DefaultPlugins)
         .add_system(close_on_esc)
         .add_plugin(DebugLinesPlugin::default())

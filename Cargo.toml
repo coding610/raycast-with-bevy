@@ -8,4 +8,5 @@ edition = "2021"
 [dependencies]
 bevy = "0.10.1"
 bevy_prototype_debug_lines = "0.10"
+bevy_prototype_lyon = "0.8.0"
 itertools = "0.10.5"

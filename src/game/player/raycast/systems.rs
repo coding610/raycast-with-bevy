@@ -2,6 +2,7 @@
 use bevy::prelude::*;
 use bevy::window::PrimaryWindow;
 use bevy_prototype_debug_lines::*;
+use itertools::izip;
 use super::components::*;
 use super::resources::*;
 use crate::game::player::components::*;
@@ -31,8 +32,6 @@ pub fn calculate_rays(
     mut player_query: Query<(&Transform, &mut Player), With<Player>>,
     collide_query: Query<&Transform, With<RayCollide>>,
     ray_resource: Res<RayVars>,
-    mut lines: ResMut<DebugLines>,
-    keyboard_input: Res<Input<KeyCode>>,
 ) {
     if let Ok((player_transform, mut player)) = player_query.get_single_mut() {
         let color_ = Color::rgb(255.0, 255.0, 255.0);
@@ -99,12 +98,6 @@ pub fn calculate_rays(
                 }
             );
 
-            if keyboard_input.pressed(KeyCode::Q) {
-                lines.line_colored(player_transform.translation, ray_vertical, 0.0, Color::rgb(0.0, 0.0, 255.0));
-            } else if keyboard_input.pressed(KeyCode::E) {
-                lines.line_colored(player_transform.translation, ray_horizontal, 0.0, Color::rgb(255.0, 0.0, 0.0));
-            }
-
         }
     }
 }
@@ -123,6 +116,7 @@ pub fn shorten_rays(
                 new_ray.x += ray_angle.cos() * max_len;
                 new_ray.y += ray_angle.sin() * max_len;
                 ray.end = new_ray;
+                ray.distance = ray_lenght(ray.start, new_ray);
             }
         }
     }
@@ -131,19 +125,15 @@ pub fn shorten_rays(
 pub fn draw_rays(
     player_query: Query<&Player, With<Player>>,
     mut lines: ResMut<DebugLines>,
-    mut shapes: ResMut<DebugShapes>,
     keyboard_input: Res<Input<KeyCode>>,
-    window_query: Query<&Window, With<PrimaryWindow>>
 ) {
-    let window = window_query.get_single().unwrap();
     if let Ok(player) = player_query.get_single() {
-        for ray in player.rays.iter() {
-            lines.line_colored(ray.start, ray.end, 0.0, Color::RED);
+        for (ray, ray_index) in izip!(player.rays.iter(), 0..player.rays.len()) {
+            if keyboard_input.pressed(KeyCode::R) {
+                lines.line_colored(ray.start, ray.end, 0.0, Color::RED);
+            } if ray_index == 0 && keyboard_input.pressed(KeyCode::T) {
+                lines.line_colored(ray.start, ray.end, 0.0, Color::rgb(255.0, 255.0, 0.0));
+            }
         }
-    }
-
-    if keyboard_input.pressed(KeyCode::B) {
-        shapes.circle().position(Vec3::new(0.0, 0.0, 0.0)).radius(10.0).color(Color::YELLOW);
-        println!("{}    {}", window.width(), window.height());
     }
 }
