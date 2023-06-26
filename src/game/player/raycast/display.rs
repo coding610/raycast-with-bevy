@@ -1,6 +1,7 @@
 use bevy::prelude::*;
 use bevy::window::PrimaryWindow;
 use bevy_prototype_debug_lines::*;
+use super::consts::*;
 use crate::game::player::components::*;
 use crate::game::resources::*;
 use crate::game::tile::consts::*;
@@ -16,21 +17,24 @@ pub fn display_raycast(
     if let Ok(player) = player_query.get_single() {
         let window = window_query.get_single().unwrap();
         
-        let mut pos = Vec3::new(window.width(), 0.0, 0.0); // Down
-        let mut size = Vec2::new(0.0, window.height());
+        let mut pos = Vec3::new(window.width(), PLAYER_HEIGHT, 0.0); // Down
+        let mut size = Vec2::new(0.0, SKY_POS);
         let x_stepsize = window.width() / player.rays.len() as f32;
 
-        let mut ray_color = Color::rgb(0.0, 1.0, 0.0); /* begin with plain WHITE and adjust the brightness */
+        let mut ray_color = Color::rgb(0.0, 0.0, 0.0);
             
         for ray in player.rays.iter() {
-            let mut new_color: f32 = 1.0 - (ray.distance / (ray_resource.ray_max_depth * TILESIZE)); if new_color < 0.0 { new_color = 0.0; }
+            let new_color: f32 = 1.0 - ((ray.distance) / (ray_resource.ray_max_depth * TILESIZE)); // Make this less bright
             ray_color.set_g(new_color);
 
             size.x = x_stepsize; // Right to left!
 
-            shapes.rect().position(Vec3::new(pos.x + size.x/2.0, pos.y + size.y/2.0, 0.0)).size(Vec2::new(size.x, size.y)).color(ray_color); // Pos in middle
+            // shapes.rect().position(Vec3::new(pos.x + size.x/2.0, pos.y + size.y/2.0, 0.0)).size(Vec2::new(size.x, size.y)).color(ray_color); // Pos in middle TODO: update this to lines, and or fill rectdis
             pos.x -= size.x; // Right to left!!
         } 
+
+        // Render ground and sky
+
     } 
 }
 

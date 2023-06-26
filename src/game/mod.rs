@@ -22,6 +22,6 @@ impl Plugin for GamePlugin {
 #[derive(States, Debug, Clone, Copy, Eq, PartialEq, Hash, Default)]
 pub enum SimulationState {
     #[default]
-    Debug, // 2D (DEFAULT)
-    Raycastig // 3D
+    Debug, // 2D
+    Raycastig // 3D (DEFAULT)
 }

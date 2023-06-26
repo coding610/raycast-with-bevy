@@ -1,6 +1,5 @@
 #![allow(unused_assignments)]
 use bevy::prelude::*;
-use bevy::window::PrimaryWindow;
 use bevy_prototype_debug_lines::*;
 use itertools::izip;
 use super::components::*;
@@ -24,8 +23,8 @@ pub fn change_ray_vars(
     if keyboard_input.pressed(KeyCode::O) { ray_resource.ray_rotation_step += 0.05; }
     if keyboard_input.pressed(KeyCode::K) { ray_resource.fov += 5.0; }
     if keyboard_input.pressed(KeyCode::L) { ray_resource.fov -= 5.0; }
-    if keyboard_input.pressed(KeyCode::P) { ray_resource.ray_max_depth += 1.0; }
-    if keyboard_input.pressed(KeyCode::LBracket) { ray_resource.ray_max_depth -= 1.0; } // KeyCode::Å
+    if keyboard_input.pressed(KeyCode::P) && ray_resource.ray_max_depth > 0.1 { ray_resource.ray_max_depth += 0.1; }
+    if keyboard_input.pressed(KeyCode::LBracket) { ray_resource.ray_max_depth -= 0.1; } // KeyCode::Å
 }
 
 pub fn calculate_rays(

@@ -8,12 +8,13 @@ pub mod systems;
 pub mod components;
 pub mod resources;
 pub mod display;
+mod consts;
 
 pub struct RaycastPlugin;
 impl Plugin for RaycastPlugin {
     fn build(&self, app: &mut App) {
         app.insert_resource(
-            RayVars {ray_rotation_step: 0.5, ray_max_depth: 5.0, fov: 90.0})
+            RayVars {ray_rotation_step: 0.05, ray_max_depth: 7.0, fov: 90.0})
             .add_system(change_ray_vars)
             .add_systems((
                 calculate_rays,
