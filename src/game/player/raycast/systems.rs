@@ -19,8 +19,8 @@ pub fn change_ray_vars(
     mut ray_resource: ResMut<RayVars>,
     keyboard_input: Res<Input<KeyCode>>
 ) {
-    if keyboard_input.pressed(KeyCode::I) && ray_resource.ray_rotation_step > 0.05 { ray_resource.ray_rotation_step -= 0.05; }
-    if keyboard_input.pressed(KeyCode::O) { ray_resource.ray_rotation_step += 0.05; }
+    if keyboard_input.pressed(KeyCode::I) && ray_resource.ray_rotation_step > 0.03 { ray_resource.ray_rotation_step -= 0.01; }
+    if keyboard_input.pressed(KeyCode::O) { ray_resource.ray_rotation_step += 0.01; }
     if keyboard_input.pressed(KeyCode::K) { ray_resource.fov += 5.0; }
     if keyboard_input.pressed(KeyCode::L) { ray_resource.fov -= 5.0; }
     if keyboard_input.pressed(KeyCode::P) && ray_resource.ray_max_depth > 0.1 { ray_resource.ray_max_depth += 0.1; }
@@ -34,8 +34,8 @@ pub fn calculate_rays(
 ) {
     if let Ok((player_transform, mut player)) = player_query.get_single_mut() {
         let color_ = Color::rgb(255.0, 255.0, 255.0);
-        let mut ray_rotation: f32 = (-ray_resource.fov/2.0) + player.rotation;
-        for _rayindex in 0..((ray_resource.fov * (1.0/ray_resource.ray_rotation_step)) as i32) {
+        let mut ray_rotation: f32 = (-ray_resource.fov/2.0) + player.rotation;  
+        for ray_index in 0..((ray_resource.fov * (1.0/ray_resource.ray_rotation_step)) as i32) {
             ray_rotation += ray_resource.ray_rotation_step;
             ray_rotation = adjust_rotation(ray_rotation);
 
@@ -94,9 +94,9 @@ pub fn calculate_rays(
                     distance: ray_lenght(player_transform.translation, default_ray),
                     rotation: ray_rotation.to_radians(),
                     color: color_,
+                    index: ray_index
                 }
             );
-
         }
     }
 }

@@ -14,7 +14,7 @@ pub struct RaycastPlugin;
 impl Plugin for RaycastPlugin {
     fn build(&self, app: &mut App) {
         app.insert_resource(
-            RayVars {ray_rotation_step: 0.05, ray_max_depth: 7.0, fov: 90.0})
+            RayVars {ray_rotation_step: 1.0, ray_max_depth: 40.0, fov: 60.0})
             .add_system(change_ray_vars)
             .add_systems((
                 calculate_rays,
